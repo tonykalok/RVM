@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>RVM Information</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    .rvm-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+
+    .rvm-card {
+      width: 750px; /* Adjust card width for responsiveness */
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box; /* Important for padding not to affect width */
+      
+      border: 2px solid #4CAF50; /* Green border */
+      background-color: #E8F5E9; /* Light green background */
+    }
+
+    /* Visual alert for full RVMs */
+    .rvm-card.full {
+      border: 2px solid red;
+      background-color: #ffe6e6; /* Light red background */
+    }
+    
+    /* Visual alert for RVMs under maintenance */
+    .rvm-card.maintenance {
+      border: 2px solid #808080; /* Gray border */
+      background-color: #D3D3D3; /* Light Gray background */
+      color: black; /* Ensure text is readable on gray background */
+    }
+    
+    .rvm-card h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .rvm-card p {
+      margin-bottom: 5px;
+    }
+
+    @media (max-width: 600px) {
+      .rvm-card {
+        width: 100%; /* Full width on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>入樽機地點</h1>
+
+  <div class="rvm-container" id="rvm-data">
+    <!-- RVM data will be inserted here -->
+  </div>
+
+  <script>
+    $(document).ready(function() {
+	  //<p><strong>RVM ID:</strong> ${rvm.rvm_id}</p>
+      $.ajax({
+        url: "https://albarvm.teamnote.work/api/rvm/",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          if (data.success) {
+            var rvms = data.rvms;
+            var rvmDataHtml = "";
+
+            // Filter the RVMs based on the address_zht containing "將軍澳", "寶林商場", or "新都城中心"
+            var filteredRvms = rvms.filter(rvm =>
+              //rvm.address_zht.includes("將軍澳") ||
+              rvm.address_zht.includes("寶林商場") ||
+              rvm.address_zht.includes("新都城中心")
+            );
+            // Then, rvms.forEach to filteredRvms.forEach
+
+            filteredRvms.forEach(function(rvm) {
+            
+              // Add the 'full' class if the status is 'full'
+              const isFull = rvm.status.toLowerCase().includes("full"); // case-insensitive check
+              const fullClass = isFull ? "full" : "";
+              const fullClassText = isFull ? "(已滿)" : "";
+              
+              // Add the 'maintenance' class if service_status is 1
+              const isMaintenance = rvm.service_status === 1;
+              const maintenanceClass = isMaintenance ? "maintenance" : "";
+              const maintenanceClassText = isMaintenance ? "(維護中)" : "";
+              
+              var percentText = "";
+              let statusDisplay = ""; // Initialize an empty string
+			  if (!isFull && !isMaintenance) {
+                  percentText = ` (已入${rvm.bin_count})`;
+                  statusDisplay = `<p><strong>空間:</strong> ${rvm.status}</p>`;
+              }
+              
+              // Extract service hours by removing the prefix
+              const serviceHourZht = rvm.service_hour_zht.replace("星期一至日及公眾假期︰", "");
+            
+              rvmDataHtml += `
+                <div class="rvm-card ${fullClass} ${maintenanceClass}">
+                  <h2>${rvm.name_zht} ${percentText} ${fullClassText} ${maintenanceClassText}</h2>
+                  <p>${rvm.address_zht}</p>
+                  <p>${serviceHourZht}</p>
+                  ${statusDisplay} 
+                </div>
+              `;
+            });
+
+            $("#rvm-data").html(rvmDataHtml);
+          } else {
+            $("#rvm-data").html("<p>Error: Unable to retrieve RVM data.</p>");
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error("Error fetching data:", error);
+          $("#rvm-data").html("<p>Error: An error occurred while fetching data.</p>");
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
