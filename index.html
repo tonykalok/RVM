@@ -57,6 +57,13 @@
         width: 100%; /* Full width on small screens */
       }
     }
+    
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-top: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -66,9 +73,30 @@
   <div class="rvm-container" id="rvm-data">
     <!-- RVM data will be inserted here -->
   </div>
+  
+  <footer>
+    上次更新: <span id="update-time"></span>
+  </footer>
 
   <script>
     $(document).ready(function() {
+    
+      function updateLastUpdatedTime() {
+        var now = new Date();
+        //var formattedTime = now.toLocaleString(); // You can customize the format
+        
+		//var now = new Date();
+		var year = now.getFullYear();
+		var month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+		var day = String(now.getDate()).padStart(2, '0');
+		var hours = String(now.getHours()).padStart(2, '0');
+		var minutes = String(now.getMinutes()).padStart(2, '0');
+		var seconds = String(now.getSeconds()).padStart(2, '0');
+		var formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+        $("#update-time").text(formattedTime);
+      }
+    
       function loadRVMData() {
 		  //<p><strong>RVM ID:</strong> ${rvm.rvm_id}</p>
 		  $.ajax({
@@ -121,6 +149,7 @@
 				});
 
 				$("#rvm-data").html(rvmDataHtml);
+				updateLastUpdatedTime(); // Update the timestamp after successful data load
 			  } else {
 				$("#rvm-data").html("<p>Error: Unable to retrieve RVM data.</p>");
 			  }
@@ -131,7 +160,7 @@
 			}
 		  });
       }
-      
+   
       // Load data initially
       loadRVMData();
 
