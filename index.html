@@ -18,7 +18,8 @@
     }
 
     .rvm-card {
-      width: 750px; /* Adjust card width for responsiveness */
+	  width: 100%;
+      /*width: 750px;*/ /* Adjust card width for responsiveness */
       margin-bottom: 20px;
       border: 1px solid #ddd;
       border-radius: 5px;
@@ -75,7 +76,7 @@
   </div>
   
   <footer>
-    上次更新: <span id="update-time"></span>
+    <a href="https://www.hkrvms3.com.hk/hk/rvmmap" target="_blank">上次更新</a>: <span id="update-time"></span>
   </footer>
 
   <script>
@@ -99,6 +100,7 @@
     
       function loadRVMData() {
 		  //<p><strong>RVM ID:</strong> ${rvm.rvm_id}</p>
+		  //<p>${rvm.address_zht}</p>
 		  $.ajax({
 			url: "https://albarvm.teamnote.work/api/rvm/",
 			type: "GET",
@@ -132,7 +134,7 @@
 				  let statusDisplay = ""; // Initialize an empty string
 				  if (!isFull && !isMaintenance) {
 					  percentText = ` (已入${rvm.bin_count})`;
-					  statusDisplay = `<p><strong>空間:</strong> ${rvm.status}</p>`;
+					  statusDisplay = `<h3><strong>空間: ${rvm.status}</strong></h3>`;
 				  }
 				  
 				  // Extract service hours by removing the prefix
@@ -141,8 +143,7 @@
 				  rvmDataHtml += `
 					<div class="rvm-card ${fullClass} ${maintenanceClass}">
 					  <h2>${rvm.name_zht} ${percentText} ${fullClassText} ${maintenanceClassText}</h2>
-					  <p>${rvm.address_zht}</p>
-					  <p>${serviceHourZht}</p>
+					  <h3>${serviceHourZht}</h3>
 					  ${statusDisplay} 
 					</div>
 				  `;
