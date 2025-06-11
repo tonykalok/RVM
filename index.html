@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>RVM Information</title>
+  <title>入樽機地點</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="refresh" content="60">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -69,66 +69,74 @@
 
   <script>
     $(document).ready(function() {
-	  //<p><strong>RVM ID:</strong> ${rvm.rvm_id}</p>
-      $.ajax({
-        url: "https://albarvm.teamnote.work/api/rvm/",
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-          if (data.success) {
-            var rvms = data.rvms;
-            var rvmDataHtml = "";
+      function loadRVMData() {
+		  //<p><strong>RVM ID:</strong> ${rvm.rvm_id}</p>
+		  $.ajax({
+			url: "https://albarvm.teamnote.work/api/rvm/",
+			type: "GET",
+			dataType: "json",
+			success: function(data) {
+			  if (data.success) {
+				var rvms = data.rvms;
+				var rvmDataHtml = "";
 
-            // Filter the RVMs based on the address_zht containing "將軍澳", "寶林商場", or "新都城中心"
-            var filteredRvms = rvms.filter(rvm =>
-              //rvm.address_zht.includes("將軍澳") ||
-              rvm.address_zht.includes("寶林商場") ||
-              rvm.address_zht.includes("新都城中心")
-            );
-            // Then, rvms.forEach to filteredRvms.forEach
+				// Filter the RVMs based on the address_zht containing "將軍澳", "寶林商場", or "新都城中心"
+				var filteredRvms = rvms.filter(rvm =>
+				  //rvm.address_zht.includes("將軍澳") ||
+				  rvm.address_zht.includes("寶林商場") ||
+				  rvm.address_zht.includes("新都城中心")
+				);
+				// Then, rvms.forEach to filteredRvms.forEach
 
-            filteredRvms.forEach(function(rvm) {
-            
-              // Add the 'full' class if the status is 'full'
-              const isFull = rvm.status.toLowerCase().includes("full"); // case-insensitive check
-              const fullClass = isFull ? "full" : "";
-              const fullClassText = isFull ? "(已滿)" : "";
-              
-              // Add the 'maintenance' class if service_status is 1
-              const isMaintenance = rvm.service_status === 1;
-              const maintenanceClass = isMaintenance ? "maintenance" : "";
-              const maintenanceClassText = isMaintenance ? "(維護中)" : "";
-              
-              var percentText = "";
-              let statusDisplay = ""; // Initialize an empty string
-			  if (!isFull && !isMaintenance) {
-                  percentText = ` (已入${rvm.bin_count})`;
-                  statusDisplay = `<p><strong>空間:</strong> ${rvm.status}</p>`;
-              }
-              
-              // Extract service hours by removing the prefix
-              const serviceHourZht = rvm.service_hour_zht.replace("星期一至日及公眾假期︰", "");
-            
-              rvmDataHtml += `
-                <div class="rvm-card ${fullClass} ${maintenanceClass}">
-                  <h2>${rvm.name_zht} ${percentText} ${fullClassText} ${maintenanceClassText}</h2>
-                  <p>${rvm.address_zht}</p>
-                  <p>${serviceHourZht}</p>
-                  ${statusDisplay} 
-                </div>
-              `;
-            });
+				filteredRvms.forEach(function(rvm) {
+				
+				  // Add the 'full' class if the status is 'full'
+				  const isFull = rvm.status.toLowerCase().includes("full"); // case-insensitive check
+				  const fullClass = isFull ? "full" : "";
+				  const fullClassText = isFull ? "(已滿)" : "";
+				  
+				  // Add the 'maintenance' class if service_status is 1
+				  const isMaintenance = rvm.service_status === 1;
+				  const maintenanceClass = isMaintenance ? "maintenance" : "";
+				  const maintenanceClassText = isMaintenance ? "(維護中)" : "";
+				  
+				  var percentText = "";
+				  let statusDisplay = ""; // Initialize an empty string
+				  if (!isFull && !isMaintenance) {
+					  percentText = ` (已入${rvm.bin_count})`;
+					  statusDisplay = `<p><strong>空間:</strong> ${rvm.status}</p>`;
+				  }
+				  
+				  // Extract service hours by removing the prefix
+				  const serviceHourZht = rvm.service_hour_zht.replace("星期一至日及公眾假期︰", "");
+				
+				  rvmDataHtml += `
+					<div class="rvm-card ${fullClass} ${maintenanceClass}">
+					  <h2>${rvm.name_zht} ${percentText} ${fullClassText} ${maintenanceClassText}</h2>
+					  <p>${rvm.address_zht}</p>
+					  <p>${serviceHourZht}</p>
+					  ${statusDisplay} 
+					</div>
+				  `;
+				});
 
-            $("#rvm-data").html(rvmDataHtml);
-          } else {
-            $("#rvm-data").html("<p>Error: Unable to retrieve RVM data.</p>");
-          }
-        },
-        error: function(xhr, status, error) {
-          console.error("Error fetching data:", error);
-          $("#rvm-data").html("<p>Error: An error occurred while fetching data.</p>");
-        }
-      });
+				$("#rvm-data").html(rvmDataHtml);
+			  } else {
+				$("#rvm-data").html("<p>Error: Unable to retrieve RVM data.</p>");
+			  }
+			},
+			error: function(xhr, status, error) {
+			  console.error("Error fetching data:", error);
+			  $("#rvm-data").html("<p>Error: An error occurred while fetching data.</p>");
+			}
+		  });
+      }
+      
+      // Load data initially
+      loadRVMData();
+
+      // Set interval to reload data every 30 seconds (30000 milliseconds)
+      setInterval(loadRVMData, 30000);
     });
   </script>
 
