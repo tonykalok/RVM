@@ -134,7 +134,7 @@
 				  let statusDisplay = ""; // Initialize an empty string
 				  if (!isFull && !isMaintenance) {
 					  percentText = ` (已入${rvm.bin_count})`;
-					  statusDisplay = `<h3><strong>空間: ${rvm.status}</strong></h3>`;
+					  statusDisplay = `<h2><strong>空間: ${rvm.status}</strong></h2>`;
 				  }
 				  
 				  // Extract service hours by removing the prefix
@@ -143,7 +143,7 @@
 				  rvmDataHtml += `
 					<div class="rvm-card ${fullClass} ${maintenanceClass}">
 					  <h2>${rvm.name_zht} ${percentText} ${fullClassText} ${maintenanceClassText}</h2>
-					  <h3>${serviceHourZht}</h3>
+					  <h2>${serviceHourZht}</h2>
 					  ${statusDisplay} 
 					</div>
 				  `;
